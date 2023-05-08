@@ -1,3 +1,5 @@
+from bitarray import bitarray
+
 class BloomFilter:
   def __init__(self, size=100):
     self.hash_table = [None] * size
