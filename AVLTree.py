@@ -4,8 +4,10 @@ from bloom_filter import BloomFilter
 It just has to be a self balancing node. 
 """
 class AVL_Tree:
-  def __init__(self, bloomFilterSize=1000):
+  def __init__(self, bloomFilterSize=1000, maxElements=1000):
     self.root = None
+    self.len_counter = 0
+    self.max_elements = maxElements
     self.bloom_filter = BloomFilter(bloomFilterSize)
 
   def search(self, target):
@@ -27,11 +29,20 @@ class AVL_Tree:
     return None 
   
   def insert(self, newNode):
+
     if self.root is None:
       self.root = newNode
       return 
 
-    self._insert(self.root, newNode)
+    try:
+      self._insert(self.root, newNode)
+
+      # If insert was successful, update bloom filter and length counter
+      self.bloom_filter.insert(newNode.key)
+      self.len_counter += 1
+    except KeyError as e:
+      print(e)
+      return
 
   def _insert(self, root, newNode):
     if root is None:
@@ -43,6 +54,9 @@ class AVL_Tree:
     
     elif newNode.key < root.key:
       root.left = self._insert(root.left, newNode)
+
+    elif newNode.key == root.key:
+      raise KeyError(f"Key {newNode.key} already exists in tree. Please call the update function instead.")
 
     # As coming up from the tree, we want to change height and calculate balance factor
     root.height = 1 + max(self._get_height(root.left), self._get_height(root.right))
@@ -106,6 +120,14 @@ class AVL_Tree:
       yield root 
       yield from self._inorder(root.right)
 
+  def __len__(self):
+    return self._len(self.root)
+
+  def _len(self, root):
+    if root is None:
+      return 0
+    return 1 + self._len(root.left) + self._len(root.right)
+
 class Node:
   """ Node class for a tree. 
   According to the LSM Architecture, we will assume that the key is of int with value of a fixed length string.
@@ -113,7 +135,7 @@ class Node:
   def __init__(self, key, value="node content created"):
     self.height = 1
     self.key = key
-    self.value = value 
+    self.value = value + key
     self.right = None 
     self.left = None 
 
