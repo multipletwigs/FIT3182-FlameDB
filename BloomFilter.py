@@ -6,25 +6,34 @@ from bitarray import bitarray
 3. Citation: https://stackoverflow.com/questions/658439/how-many-hash-functions-does-my-bloom-filter-need
 """
 class BloomFilter:
-  def __init__(self, size=100):
+  def __init__(self, size=100000, avg_bits=4):
     self.hash_table = [0] * size
-  
-  def _hash_gen(self):
-    pass 
+    self.avg_bits = avg_bits 
   
   def insert(self, key):
-    # 1. Hash Key
+    for i in range(self.avg_bits):
+      hash_val = hash(key) % len(self.hash_table)
+      self.hash_table[hash_val] = 1
 
-    # 2. Insert to hash table
-    pass 
+  def membership_check(self, key, debug=False):
+    for i in range(self.avg_bits):
+      hash_val = hash(key) % len(self.hash_table)
+      if self.hash_table[hash_val] == 0:
+        if debug:
+          print(f"Key {key} is not in bloom filter.")
+        return False
 
-  def membership_check(self, key):
-    # 1. Hash key
+    if debug:
+      print(f"Key {key} is potentially in bloom filter.")
+    return True
 
-    # 2. Check if maybe in hash table
-
-    # 3. return True if maybe in, False if not
-    pass 
+if __name__ == "__main__":
+  bf = BloomFilter()
+  bf.insert("hello")
+  bf.insert("world")
+  print(bf.membership_check("hello", debug=True))
+  print(bf.membership_check("world", debug=True))
+  print(bf.membership_check("hello world", debug=True))
 
   
 

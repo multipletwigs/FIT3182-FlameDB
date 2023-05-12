@@ -1,4 +1,4 @@
-class Compaction:
+class Manager:
   def __init__(self, sstable1, sstable2):
     self.sstable1 = sstable1
     self.sstable2 = sstable2

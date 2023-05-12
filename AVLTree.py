@@ -1,4 +1,4 @@
-from bloom_filter import BloomFilter
+from BloomFilter import BloomFilter
 
 """ In-memory component of the LSM Architecture.
 It just has to be a self balancing node. 
@@ -11,6 +11,11 @@ class AVL_Tree:
     self.bloom_filter = BloomFilter(bloomFilterSize)
 
   def search(self, target):
+
+    # Check bloom filter first
+    if not self.bloom_filter.membership_check(target):
+      raise KeyError(f"Key {target} not found in tree. Bloom Filter says so.") 
+
     return self._search(self.root, target)
   
   def _search(self, root, target):
@@ -135,7 +140,7 @@ class Node:
   def __init__(self, key, value="node content created"):
     self.height = 1
     self.key = key
-    self.value = value + key
+    self.value = value + str(key)
     self.right = None 
     self.left = None 
 
@@ -143,11 +148,20 @@ class Node:
     return f"Key: {self.key} with value {self.value}"
 
 if __name__ == "__main__":
+  print("--- Testing AVL Tree ---") 
   avl_tree = AVL_Tree()
   avl_tree.insert(Node(5))
   avl_tree.insert(Node(3))
   avl_tree.insert(Node(7))
   avl_tree.insert(Node(2))
+
+  print("--- Inorder traversal ---")
   # print(str(avl_tree.search(100)))
   for node in avl_tree.inorder():
     print(node)
+
+  print("--- Testing bloom filter ---")
+  print(avl_tree.search(5))
+  print(avl_tree.search(100))
+  print(avl_tree.search(2))
+  print(avl_tree.search(3))
