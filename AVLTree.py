@@ -160,7 +160,7 @@ if __name__ == "__main__":
   for node in avl_tree.inorder():
     print(node)
 
-  print("--- Testing bloom filter ---")
+  print("--- Testing bloom filter using Search ---")
   print(avl_tree.search(5))
   print(avl_tree.search(100))
   print(avl_tree.search(2))

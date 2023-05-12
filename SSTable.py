@@ -17,7 +17,7 @@ class SSTable:
       for node in generator:
         f.write(f"{node.key} {node.value}\n")
 
-  def seach_sstable(self, key):
+  def search_sstable(self, key):
     # Load the SSTable into memory and search for the key using binary search
     with open(f'./level/{self.level}/SSTable_{self.level}{self.group}.sst', 'r') as f:
       lines = f.readlines()
