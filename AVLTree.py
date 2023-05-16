@@ -69,27 +69,29 @@ class AVL_Tree:
     # Calculate balance factor
     left_height = 0 if root.left is None else root.left.height 
     right_height = 0 if root.right is None else root.right.height 
-    balance_factor = left_height - right_height 
+    balance_factor = right_height - left_height 
 
-    if balance_factor > 1 and newNode.key > root.right.key:
+    if balance_factor > 1 and (root.right is None or newNode.key > root.right.key):
       return self._right_rotate(root)
 
-    if balance_factor < -1 and newNode.key < root.left.key:
-      return self._left_rotate(root) 
+    if balance_factor < -1 and (root.left is None or newNode.key < root.left.key):
+        return self._left_rotate(root)
 
-    if balance_factor > 1 and newNode.key > root.left.key:
-      root.left = self._left_rotate(root.left)
-      return self._right_rotate(root) 
+    if balance_factor > 1 and (root.left is not None and newNode.key > root.left.key):
+        root.left = self._left_rotate(root.left)
+        return self._right_rotate(root)
 
-    if balance_factor < -1 and newNode.key < root.right.key:
-      root.right = self._right_rotate(root.right) 
-      return self._left_rotate(root) 
+    if balance_factor < -1 and (root.right is not None and newNode.key < root.right.key):
+        root.right = self._right_rotate(root.right)
+        return self._left_rotate(root)
 
     return root  
 
   def _right_rotate(self, head):
     # The right side becomes the head
     new_head = head.left
+    if new_head is None:
+        return head
     head.left = new_head.right 
     new_head.right = head
 
@@ -101,12 +103,23 @@ class AVL_Tree:
 
   def _left_rotate(self, head):
     new_head = head.right 
+    if new_head is None:
+        return head
+
     head.right = new_head.left 
+    if head.right is not None:
+        head.right.parent = head  # Update parent reference
+
     new_head.left = head 
 
     # Update the height of the node 
-    head.height = 1 + max(head.left.height, head.right.height)
-    new_head.height = 1 + max(new_head.left.height, new_head.right.height)
+    head_height = head.left.height if head.left is not None else 0
+    right_height = head.right.height if head.right is not None else 0
+    head.height = 1 + max(head_height, right_height)
+
+    new_head_height = new_head.left.height if new_head.left is not None else 0
+    new_head_right_height = new_head.right.height if new_head.right is not None else 0
+    new_head.height = 1 + max(new_head_height, new_head_right_height)
 
     return new_head
   
@@ -150,10 +163,10 @@ class Node:
 if __name__ == "__main__":
   print("--- Testing AVL Tree ---") 
   avl_tree = AVL_Tree()
-  avl_tree.insert(Node(5))
-  avl_tree.insert(Node(3))
+  avl_tree.insert(Node(10))
+  avl_tree.insert(Node(9))
+  avl_tree.insert(Node(8))
   avl_tree.insert(Node(7))
-  avl_tree.insert(Node(2))
 
   print("--- Inorder traversal ---")
   # print(str(avl_tree.search(100)))
