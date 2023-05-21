@@ -1,7 +1,7 @@
 from BloomFilter import BloomFilter
 
-""" In-memory component of the LSM Architecture.
-It just has to be a self balancing node. 
+""" In-memory component (memtable) of the LSM Architecture.
+It just has to be a self balancing node.  
 """
 class AVL_Tree:
   def __init__(self, bloomFilterSize=1000, maxElements=1000):
