@@ -8,6 +8,10 @@ class LevelManager:
 
   def add_sstable(self, sstable):
     self.sstable_list.append(sstable)
+    
+    # Write SSTable to the directory 
+    sstable.write_sstable_from_memtable(sstable.memtable) 
+  
     self.size += 1
 
   def get_sstable(self, index):

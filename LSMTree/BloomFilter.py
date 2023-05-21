@@ -1,10 +1,3 @@
-from bitarray import bitarray
-
-""" Small scale bloom filter
-1. It takes in the number of elements that you're planning to store
-2. From there, based on a particular error rate, determine size of hash_table
-3. Citation: https://stackoverflow.com/questions/658439/how-many-hash-functions-does-my-bloom-filter-need
-"""
 class BloomFilter:
 
   def __init__(self, level):

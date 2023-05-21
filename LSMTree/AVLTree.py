@@ -1,14 +1,14 @@
-from BloomFilter import BloomFilter
+from LSMTree.BloomFilter import BloomFilter
 
 """ In-memory component (memtable) of the LSM Architecture.
 It just has to be a self balancing node.  
 """
 class AVL_Tree:
-  def __init__(self, bloomFilterSize=1000, maxElements=1000):
+  def __init__(self, bloomFilterSize=1000, maxElements=100):
     self.root = None
     self.len_counter = 0
     self.max_elements = maxElements
-    self.bloom_filter = BloomFilter(bloomFilterSize)
+    self.bloom_filter = BloomFilter(level=0)
 
   def search(self, target):
 
@@ -145,6 +145,9 @@ class AVL_Tree:
     if root is None:
       return 0
     return 1 + self._len(root.left) + self._len(root.right)
+
+  def memtable_is_full(self):
+    return self.len_counter >= self.max_elements
 
 class Node:
   """ Node class for a tree. 
