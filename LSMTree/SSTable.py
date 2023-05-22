@@ -12,6 +12,11 @@ class SSTable:
     self.level_path = f'./harddisk/level_{self.level}'
     self.file_path = f'./harddisk/level_{self.level}/SSTable_{self.level}{self.group}.sst'
 
+  def read_sstable(self):
+    with open(self.file_path, 'r') as f:
+      lines = f.readlines()
+      return lines
+
   def write_sstable_from_memtable(self, memtable):
     # Create group directory if it doesn't exist
     if not os.path.exists(self.level_path):
@@ -26,11 +31,11 @@ class SSTable:
         self.bloomFilter.insert(node.key)
 
   # K-way merge ensures that writing to sstable is in order. 
-  def write_to_sstable(self, key):
-    # Open the SSTable file, append to the bottom
-    with open(self.file_path, 'a') as f:
+  def write_to_sstable(self, kv):
+    with open(self.file_path, 'w') as f:
       self.num_elements += 1
-      f.write(f"{key}|{self.bloomFilter.insert(key)}\n")
+      self.bloomFilter.insert(kv['key'])
+      f.write(f"{kv['key']}|{kv['value']}\n")
 
   # If the sstable is full, the manager should create a new sstable and continue writing to the other sstable
   def sstable_is_full(self):
