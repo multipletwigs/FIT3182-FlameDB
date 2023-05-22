@@ -32,7 +32,6 @@ def initialize_app(max_size=100, size_multiple=5, hobf=True, search_size=100):
     search_workload = random.sample(insert_workload, 1000)
     return memtable, level_1, level_2, insert_workload, search_workload
 
-
 def LSM_Insert(gls, max_size, size_multiple, hobf=True, benchmark=True):
 
     memtable, level_1, level_2, insert_workload, search_workload = initialize_app(
@@ -44,6 +43,7 @@ def LSM_Insert(gls, max_size, size_multiple, hobf=True, benchmark=True):
     group = 0
 
     # Insert workload into memtable
+    print("Now Inserting...")
     for idx, node in enumerate(insert_workload):
         memtable.insert(node)
         if memtable.memtable_is_full():
@@ -71,6 +71,7 @@ def LSM_Insert(gls, max_size, size_multiple, hobf=True, benchmark=True):
 
             # Add sstable to level 1
             level_1.add_sstable(sstable)
+    print("Finished inserting! ...")
 
     # Benchmarking search
     print("Now searching...")
@@ -84,7 +85,7 @@ def LSM_Insert(gls, max_size, size_multiple, hobf=True, benchmark=True):
                 results, buffer_used = level_2.search_level(node)
                 total_search_buffer_used += buffer_used
 
-    print("Finished searching!")
+    print("Finished searching! ...")
 
     if benchmark:
         # Write workload measurement for disk amplification
