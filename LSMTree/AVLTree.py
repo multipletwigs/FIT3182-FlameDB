@@ -6,22 +6,22 @@ import sys
 It just has to be a self balancing node.  
 """
 class AVL_Tree:
-  def __init__(self, bloomFilterSize=1000, maxElements=100):
+  def __init__(self, bloomFilterSize=1000, hobf=False, maxElements=100):
     self.root = None
     self.max_elements = maxElements
-    self.bloom_filter = BloomFilter(level=0)
+    self.bloom_filter = BloomFilter(level=0, hobf=False)
 
   def search(self, target):
 
     # Check bloom filter first
-    if not self.bloom_filter.membership_check(target):
-      raise KeyError(f"Key {target} not found in tree. Bloom Filter says so.") 
+    if not self.bloom_filter.membership_check(target.key):
+      return None
 
-    return self._search(self.root, target)
+    return self._search(self.root, target.key)
   
   def _search(self, root, target):
     if root is None:
-      raise KeyError(f"Key {target} not found in tree.") 
+      return None
 
     if root.key == target:
       return root 

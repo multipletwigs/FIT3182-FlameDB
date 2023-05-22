@@ -1,13 +1,22 @@
 class BloomFilter:
 
-  def __init__(self, level):
+  def __init__(self, level, hobf=False):
 
-    # Mapping of level to size of hash table
+    # Mapping of level to size of hash table, 
+    # using the heterogenous bloom filters
     SIZE_MAPPING = {
         0: 100000,
         1: 10000,
         2: 1000,
-        3: 100
+      }
+
+    # If using homogenous bloom filters, 
+    # all levels have the same size
+    if hobf:
+      SIZE_MAPPING = {
+          0: 1000,
+          1: 1000,
+          2: 1000,
       }
 
     # The upper the component, the more bits that the hash table is assigned to

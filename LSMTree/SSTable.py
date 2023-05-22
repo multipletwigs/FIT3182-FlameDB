@@ -1,14 +1,14 @@
 from LSMTree.AVLTree import AVL_Tree, Node
 from LSMTree.BloomFilter import BloomFilter
-import os
+import os, sys
 
 class SSTable:
-  def __init__(self, level, group):
+  def __init__(self, level, group, hobf):
     self.level = level
     self.group = group
     self.max_elements = 100
     self.num_elements = 0
-    self.bloomFilter = BloomFilter(self.level) 
+    self.bloomFilter = BloomFilter(self.level, hobf=hobf) 
     self.level_path = f'./harddisk/level_{self.level}'
     self.file_path = f'./harddisk/level_{self.level}/SSTable_{self.level}{self.group}.sst'
 
@@ -49,20 +49,23 @@ class SSTable:
 
   def search_sstable(self, key):
 
+    total_buffer_used = 0
+
     # Check if the key is in the bloom filter
     if not self.bloomFilter.membership_check(key):
-      raise KeyError(f"Key {key} not found in SSTable. Bloom Filter says so.")
+      return None, total_buffer_used
 
     # Load the SSTable into memory and search for the key using binary search 
     with open(self.file_path, 'r') as f:
       lines = f.readlines()
+      total_buffer_used += sys.getsizeof(lines)
 
       # If the binary search returns None, means nothing was found
       item = self._binary_search(lines, key)
       if item:
-        return item
+        return item, total_buffer_used
       else:
-        raise KeyError
+        return None, total_buffer_used
 
   def _binary_search(self, lines, key):
     left = 0

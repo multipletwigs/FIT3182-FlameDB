@@ -2,11 +2,12 @@ from LSMTree.SSTable import SSTable
 import os, sys
 
 class LevelManager:
-  def __init__(self, level, max_size):
+  def __init__(self, level, max_size, hobf):
     self.sstable_list = []
     self.level = level
     self.directory = f'./harddisk/level_{self.level}'
     self.size = 0
+    self.hobf = hobf
     self.max_size = max_size
 
     # Create directory if it doesn't exist
@@ -22,7 +23,7 @@ class LevelManager:
 
     # Merge the buffer into a new sstable
     group = 0
-    sstable = SSTable(level=self.level + 1, group=group) 
+    sstable = SSTable(level=self.level + 1, group=group, hobf=self.hobf) 
     buffer_size = sys.getsizeof(buffer)
 
     # Based on the whole buffer, split into appropriate sstables and groups if the SSTable is already full 
@@ -35,7 +36,7 @@ class LevelManager:
         group += 1
 
         # Create a new sstable 
-        sstable = SSTable(level=self.level + 1, group=group)
+        sstable = SSTable(level=self.level + 1, group=group, hobf=self.hobf)
 
       sstable.write_to_sstable({
         'key': int(item.split('|')[0]),
@@ -56,7 +57,7 @@ class LevelManager:
 
     # Merge the buffer into a new sstable
     group = 0
-    sstable = SSTable(level=self.level + 1, group=group)
+    sstable = SSTable(level=self.level + 1, group=group, hobf=self.hobf)
 
     # Based on the whole buffer, split into appropriate sstables and groups if the SSTable is already full
     for item in buffer:
@@ -68,7 +69,7 @@ class LevelManager:
         group += 1
 
         # Create a new sstable
-        sstable = SSTable(level=self.level + 1, group=group)
+        sstable = SSTable(level=self.level + 1, group=group, hobf=self.hobf)
 
       sstable.write_to_sstable({
         'key': int(item.split('|')[0]),
@@ -94,6 +95,13 @@ class LevelManager:
 
     for file in os.listdir(self.directory):
       os.remove(os.path.join(self.directory, file))
+
+  def search_level(self, node):
+    for sstable in self.sstable_list:
+      value, buffer_used = sstable.search_sstable(node.key)
+      if value:
+        return value, buffer_used
+    return None, buffer_used
     
   def add_sstable(self, sstable):
     self.sstable_list.append(sstable)  
