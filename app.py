@@ -5,6 +5,7 @@ from LSMTree.BloomFilter import BloomFilter
 import shutil 
 import argparse
 import os
+import random
 
 def clear_harddisk():
   if os.path.exists('./harddisk'):
@@ -21,7 +22,8 @@ def LSM_Execute(gls, pause_level):
   level_2 = LevelManager(level=2, max_size=10) # Houses 10 sstables 
   level_3 = LevelManager(level=3, max_size=15) # Houses 15 sstables
 
-  insert_workload = [i for i in range(1200)]
+  # Random unique insert workload
+  insert_workload = random.sample(range(1, 100000), 2000)
 
   # This inserts to level 0, and flushes to level 1
   def level_0_flush():
@@ -67,7 +69,7 @@ def LSM_Execute(gls, pause_level):
   executes = [level_0_flush, level_1_flush, level_2_flush]
 
   # Execute the flushes up to the pause level 
-  for level in range(pause_level):
+  for level in range(pause_level + 1):
     func = executes[level] 
     func() 
       
@@ -76,21 +78,21 @@ if __name__=="__main__":
   parser = argparse.ArgumentParser(prog="LSM") 
   subparsers = parser.add_subparsers(dest='command') 
 
-  structure_modifier_parser = subparsers.add_parser('structure_modifier') 
-  structure_modifier_parser.add_argument('--remove_harddisk', action='store_true')
+  structure_modifier_parser = subparsers.add_parser('harddisk') 
+  structure_modifier_parser.add_argument('--remove-harddisk', action='store_true')
 
-  lsm_execute = subparsers.add_parser('lsm_execute')  
+  lsm_execute = subparsers.add_parser('lsm-execute')  
   lsm_execute.add_argument('--gls', action='store_true', default=False) 
-  lsm_execute.add_argument('--pause_stage', type=int, choices=[0,1,2], default=1) 
+  lsm_execute.add_argument('--pause-stage', type=int, choices=[0,1,2], default=1) 
 
   args = parser.parse_args()
 
-  if args.command == 'structure_modifier':
+  if args.command == 'harddisk':
     if args.remove_harddisk:
       print("---- Clearing your harddisk ----")
       clear_harddisk() 
   
-  elif args.command == 'lsm_execute':
+  elif args.command == 'lsm-execute':
     if args.gls:
       print("---- Using GLS ----")
       level = args.pause_stage

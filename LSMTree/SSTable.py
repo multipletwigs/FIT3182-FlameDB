@@ -32,10 +32,16 @@ class SSTable:
 
   # K-way merge ensures that writing to sstable is in order. 
   def write_to_sstable(self, kv):
-    with open(self.file_path, 'w') as f:
+
+    # Make file if it doesn't exist
+    if not os.path.exists(self.file_path):
+      with open(self.file_path, 'w') as f:
+        pass
+
+    with open(self.file_path, 'a') as f:
       self.num_elements += 1
       self.bloomFilter.insert(kv['key'])
-      f.write(f"{kv['key']}|{kv['value']}\n")
+      f.write(f"{kv['key']}|{kv['value']}")
 
   # If the sstable is full, the manager should create a new sstable and continue writing to the other sstable
   def sstable_is_full(self):

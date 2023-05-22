@@ -18,17 +18,16 @@ class LevelManager:
   """
   def gls_merge(self, next_level_manager):
     # Read all sstables into buffer 
-    buffer = set() 
+    buffer = []
     for sstable in self.sstable_list:
 
       # A set is used here to remove duplicates! 
       # Compaction states we should remove duplicates, 
       # and the last sstable in the list is the most recent 
-      for item in sstable.read_sstable():
-        buffer.add(item)
+      buffer.extend(sstable.read_sstable())
 
     # Sort the buffer based on a split key 
-    buffer = list(buffer)
+    buffer = list(set(buffer))
     buffer.sort(key=lambda x: int(x.split('|')[0])) 
 
     # Merge the buffer into a new sstable
