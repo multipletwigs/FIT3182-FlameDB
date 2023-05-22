@@ -1,5 +1,5 @@
-from LSMTree.SSTable import SSTable
-import os
+from LSMTree.SSTable import SSTable 
+import os, sys
 
 class LevelManager:
   def __init__(self, level, max_size):
@@ -18,21 +18,12 @@ class LevelManager:
   """
   def gls_merge(self, next_level_manager):
     # Read all sstables into buffer 
-    buffer = []
-    for sstable in self.sstable_list:
-
-      # A set is used here to remove duplicates! 
-      # Compaction states we should remove duplicates, 
-      # and the last sstable in the list is the most recent 
-      buffer.extend(sstable.read_sstable())
-
-    # Sort the buffer based on a split key 
-    buffer = list(set(buffer))
-    buffer.sort(key=lambda x: int(x.split('|')[0])) 
+    buffer = self.read_to_buffer(sstable_list=self.sstable_list)
 
     # Merge the buffer into a new sstable
     group = 0
     sstable = SSTable(level=self.level + 1, group=group) 
+    buffer_size = sys.getsizeof(buffer)
 
     # Based on the whole buffer, split into appropriate sstables and groups if the SSTable is already full 
     for item in buffer:
@@ -53,18 +44,12 @@ class LevelManager:
 
     # After flushing the buffer to the next level, clear the sstables in the current level 
     self.purge_level()
+    return buffer_size
 
   def trad_merge(self, next_level_manager):
     # Read all sstables into buffer, both levels
-    buffer = set()
-    for sstable in self.sstable_list:
-      for item in sstable.read_sstable():
-        buffer.add(item)
-
-    for sstable in next_level_manager.get_sstable_list():
-      for item in sstable.read_sstable():
-        buffer.add(item)
-
+    buffer = self.read_to_buffer(sstable_list=self.sstable_list + next_level_manager.get_sstable_list())
+  
     # Sort the buffer based on a split key
     buffer = list(buffer)
     buffer.sort(key=lambda x: int(x.split('|')[0]))
@@ -92,6 +77,16 @@ class LevelManager:
 
     # After flushing the buffer to the next level, clear the sstables in the current level
     self.purge_level()
+    buffer_size = sys.getsizeof(buffer) 
+    return buffer_size 
+  
+  def read_to_buffer(self, sstable_list):
+    buffer = [] 
+    for sstable in sstable_list:
+      buffer.extend(sstable.read_sstable()) 
+      buffer = list(set(buffer)) 
+      buffer.sort(key=lambda x: int(x.split('|')[0])) 
+    return buffer
 
   def purge_level(self):
     self.sstable_list = []
@@ -103,7 +98,6 @@ class LevelManager:
   def add_sstable(self, sstable):
     self.sstable_list.append(sstable)  
     # Add to the directory as well 
-
     self.size += 1
 
   def get_sstable(self, index):
@@ -114,5 +108,6 @@ class LevelManager:
 
   def level_is_full(self):
     return self.size >= self.max_size
+
 
   

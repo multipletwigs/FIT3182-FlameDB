@@ -1,4 +1,6 @@
 from LSMTree.BloomFilter import BloomFilter
+# from BloomFilter import BloomFilter
+import sys
 
 """ In-memory component (memtable) of the LSM Architecture.
 It just has to be a self balancing node.  
@@ -6,7 +8,6 @@ It just has to be a self balancing node.
 class AVL_Tree:
   def __init__(self, bloomFilterSize=1000, maxElements=100):
     self.root = None
-    self.len_counter = 0
     self.max_elements = maxElements
     self.bloom_filter = BloomFilter(level=0)
 
@@ -42,9 +43,8 @@ class AVL_Tree:
     try:
       self._insert(self.root, newNode)
 
-      # If insert was successful, update bloom filter and length counter
+      # If insert was successful, update bloom filter
       self.bloom_filter.insert(newNode.key)
-      self.len_counter += 1
     except KeyError as e:
       print(e)
       return
@@ -147,7 +147,15 @@ class AVL_Tree:
     return 1 + self._len(root.left) + self._len(root.right)
 
   def memtable_is_full(self):
-    return self.len_counter >= self.max_elements
+    return len(self) >= self.max_elements
+
+  def total_bytes(self):
+    return self._total_bytes(self.root)
+
+  def _total_bytes(self, root):
+    if root is None:
+      return 0
+    return sys.getsizeof(root) + self._total_bytes(root.left) + self._total_bytes(root.right)
 
 class Node:
   """ Node class for a tree. 
@@ -165,12 +173,11 @@ class Node:
 
 if __name__ == "__main__":
   print("--- Testing AVL Tree ---") 
+  import random
   avl_tree = AVL_Tree()
-  avl_tree.insert(Node(10))
-  avl_tree.insert(Node(9))
-  avl_tree.insert(Node(8))
-  avl_tree.insert(Node(7))
-
+  nodes = [Node(i) for i in random.sample(range(1, 2000), 1000)]
+  for node in nodes:
+    avl_tree.insert(node) 
   print("--- Inorder traversal ---")
   # print(str(avl_tree.search(100)))
   for node in avl_tree.inorder():
@@ -181,3 +188,4 @@ if __name__ == "__main__":
   print(avl_tree.search(100))
   print(avl_tree.search(2))
   print(avl_tree.search(3))
+  print(len(avl_tree))

@@ -7,6 +7,7 @@ class BloomFilter:
         0: 100000,
         1: 10000,
         2: 1000,
+        3: 100
       }
 
     # The upper the component, the more bits that the hash table is assigned to
