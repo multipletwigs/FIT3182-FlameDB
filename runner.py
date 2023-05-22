@@ -3,7 +3,6 @@ from LSMTree.SSTable import SSTable
 from LSMTree.LevelManager import LevelManager
 from LSMTree.BloomFilter import BloomFilter
 import shutil
-import psutil
 import argparse
 import os
 import random
@@ -12,6 +11,7 @@ import sys
 def clear_harddisk():
     if os.path.exists('./harddisk'):
         shutil.rmtree('./harddisk')
+
 
 def initialize_app(max_size=100, size_multiple=5, hobf=True, search_size=100):
     random.seed(42)
@@ -83,7 +83,7 @@ def LSM_Insert(gls, max_size, size_multiple, hobf=True, benchmark=True):
             if not results:
                 results, buffer_used = level_2.search_level(node)
                 total_search_buffer_used += buffer_used
-    
+
     print("Finished searching!")
 
     if benchmark:
@@ -103,4 +103,4 @@ def LSM_Insert(gls, max_size, size_multiple, hobf=True, benchmark=True):
             f"Disk Amplification: {(total_search_buffer_used) / total_search_size}\n")
         search_amp = total_search_buffer_used / total_search_size
 
-        return insert_amp, search_amp
+        return insert_amp, search_amp, total_insert_size, total_buffer_used, total_search_size, total_search_buffer_used
