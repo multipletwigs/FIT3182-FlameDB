@@ -68,7 +68,7 @@ def gls_command(args):
         print(f"---- Running GLS with HEBF where Level 1: {MAX_SIZE} and Level 2: {MAX_SIZE * SIZE_MULTIPLE} ----")
         LSM_Insert(gls=True, benchmark=False, max_size=MAX_SIZE, size_multiple=SIZE_MULTIPLE, hobf=False)
     else:
-        print("Please specify either --hobf or --hebf with --gls.")
+        print("Please specify either --hobf or --hebf with gls.")
 
 def trad_command(args):
     if args.hobf:

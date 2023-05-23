@@ -29,6 +29,7 @@ def initialize_app(max_size=100, size_multiple=5, hobf=True, search_size=100):
     # Insert workload, here * 100 is because SSTables are 100 in size by default
     insert_workload = [Node(i) for i in range((max_size * 100 + max_size *
                                                size_multiple * 100) - random.randint(max_size, max_size * size_multiple))]
+                                               
     search_workload = random.sample(insert_workload, 1000)
     return memtable, level_1, level_2, insert_workload, search_workload
 
